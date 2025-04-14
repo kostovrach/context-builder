@@ -1,0 +1,13 @@
+{
+  "name": "project-context-builder",
+  "version": "1.0.0",
+  "description": "Авто-экспортер структуры и зависимостей проекта",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "marked": "^9.1.6",
+    "puppeteer": "^22.15.0"
+  }
+}
