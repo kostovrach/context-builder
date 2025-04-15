@@ -1,14 +1,13 @@
+const fs = require("fs");
+const path = require("path");
+const { scanProject } = require("./utils/scanProject");
+const { getFilePreview } = require("./utils/filePreview");
+const { scanDependencies } = require("./utils/dependencyScanner");
+const { exportToPDF } = require("./utils/exportToPDF");
 
-const fs = require('fs');
-const path = require('path');
-const { scanProject } = require('./utils/scanProject');
-const { getFilePreview } = require('./utils/filePreview');
-const { scanDependencies } = require('./utils/dependencyScanner');
-const { exportToPDF } = require('./utils/exportToPDF');
-
-const OUTPUT_DIR = path.join(__dirname, 'output');
-const OUTPUT_FILE = path.join(OUTPUT_DIR, 'project-context.md');
-const OUTPUT_PDF = path.join(OUTPUT_DIR, 'project-context.pdf');
+const OUTPUT_DIR = path.join(__dirname, "output");
+const OUTPUT_FILE = path.join(OUTPUT_DIR, "project-context.md");
+const OUTPUT_PDF = path.join(OUTPUT_DIR, "project-context.pdf");
 const ROOT_PATH = process.argv[2] || process.cwd();
 
 (async () => {
@@ -18,21 +17,21 @@ const ROOT_PATH = process.argv[2] || process.cwd();
   const filePreviews = getFilePreview(ROOT_PATH);
   const deps = scanDependencies(ROOT_PATH);
 
-  let depsText = `##Обнаруженные зависимости\n\n`;
+  let depsText = `Зависимости проекта\n\n`;
   deps.forEach(({ file, deps }) => {
     depsText += `**${file}**\n`;
-    deps.forEach(dep => {
+    deps.forEach((dep) => {
       depsText += `  - ${dep}\n`;
     });
-    depsText += '\n';
+    depsText += "\n";
   });
 
-  const result = `##Контекст проекта\n\n` +
-    `##Структура\n\n\`\`\`\n${structure}\n\`\`\`\n\n` +
-    `##Сниппеты файлов\n\n${filePreviews}\n` +
+  const result =
+    `Структура проекта\n\n\`\`\`\n${structure}\n\`\`\`\n\n` +
+    `Сниппеты файлов\n\n${filePreviews}\n` +
     `${depsText}`;
 
-  fs.writeFileSync(OUTPUT_FILE, result, 'utf-8');
+  fs.writeFileSync(OUTPUT_FILE, result, "utf-8");
   console.log(`Контекст проекта сохранён в: ${OUTPUT_FILE}`);
 
   await exportToPDF(OUTPUT_FILE, OUTPUT_PDF);

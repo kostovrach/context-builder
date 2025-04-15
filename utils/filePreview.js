@@ -1,4 +1,3 @@
-
 const fs = require('fs');
 const path = require('path');
 
@@ -8,8 +7,9 @@ const SUPPORTED_EXTENSIONS = [
 ];
 
 const IGNORED_DIRS = ['node_modules', '.git', 'dist', 'build'];
+const IGNORED_FILES = ['package-lock.json', '.DS_Store', 'thumbs.db'];
 
-function getFilePreview(baseDir, maxLines = 10) {
+function getFilePreview(baseDir, maxLines = 250) {
   let result = '';
 
   function walk(dir) {
@@ -18,11 +18,14 @@ function getFilePreview(baseDir, maxLines = 10) {
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
 
-      if (entry.isDirectory() && !IGNORED_DIRS.includes(entry.name)) {
-        walk(fullPath);
+      if (entry.isDirectory()) {
+        if (!IGNORED_DIRS.includes(entry.name)) {
+          walk(fullPath);
+        }
       } else if (entry.isFile()) {
-        const ext = path.extname(entry.name).toLowerCase();
+        if (IGNORED_FILES.includes(entry.name)) continue;
 
+        const ext = path.extname(entry.name).toLowerCase();
         if (SUPPORTED_EXTENSIONS.includes(ext)) {
           try {
             const content = fs.readFileSync(fullPath, 'utf-8')
@@ -30,7 +33,7 @@ function getFilePreview(baseDir, maxLines = 10) {
               .slice(0, maxLines)
               .join('\n');
             const relativePath = path.relative(baseDir, fullPath);
-            result += `###${relativePath}\n\`\`\`${getMarkdownLang(ext)}\n${content}\n\`\`\`\n\n`;
+            result += `### ${relativePath}\n\`\`\`${getMarkdownLang(ext)}\n${content}\n\`\`\`\n\n`;
           } catch (err) {
             console.warn(`Не удалось прочитать: ${fullPath}`);
           }
